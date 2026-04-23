@@ -45,6 +45,6 @@ func main() {
 			fmt.Println("Error sending PONG response: ", err.Error())
 			os.Exit(1)
 		}
-
+		l.Close()
 	}
 }

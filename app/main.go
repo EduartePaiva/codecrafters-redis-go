@@ -26,25 +26,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	conn, err := l.Accept()
+	if err != nil {
+		fmt.Println("Error accepting connection: ", err.Error())
+		os.Exit(1)
+	}
+	defer l.Close()
 	for {
-		conn, err := l.Accept()
-		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
-		}
-
 		input, err := io.ReadAll(conn)
 		if err != nil {
 			fmt.Println("Error reading content: ", err.Error())
-			continue
+			break
 		}
 		fmt.Println(string(input))
 
 		_, err = conn.Write([]byte(PONG))
 		if err != nil {
 			fmt.Println("Error sending PONG response: ", err.Error())
-			os.Exit(1)
+			break
 		}
-		l.Close()
 	}
 }

@@ -25,25 +25,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	conn, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
-	defer l.Close()
-	buf := make([]byte, 1024)
 	for {
-		_, err := conn.Read(buf)
+		conn, err := l.Accept()
 		if err != nil {
-			fmt.Println("Error reading content: ", err.Error())
-			break
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
 		}
-		fmt.Println(string(buf))
 
-		_, err = conn.Write([]byte(PONG))
-		if err != nil {
-			fmt.Println("Error sending PONG response: ", err.Error())
-			break
-		}
+		go func() {
+			defer conn.Close()
+			buf := make([]byte, 1024)
+			for {
+				_, err := conn.Read(buf)
+				if err != nil {
+					fmt.Println("Error reading content: ", err.Error())
+					break
+				}
+				fmt.Println(string(buf))
+
+				_, err = conn.Write([]byte(PONG))
+				if err != nil {
+					fmt.Println("Error sending PONG response: ", err.Error())
+					break
+				}
+			}
+		}()
+
 	}
+
 }

@@ -32,13 +32,14 @@ func main() {
 		os.Exit(1)
 	}
 	defer l.Close()
+	buf := make([]byte, 1024)
 	for {
-		input, err := io.ReadAll(conn)
+		_, err := conn.Read(buf)
 		if err != nil {
 			fmt.Println("Error reading content: ", err.Error())
 			break
 		}
-		fmt.Println(string(input))
+		fmt.Println(string(buf))
 
 		_, err = conn.Write([]byte(PONG))
 		if err != nil {

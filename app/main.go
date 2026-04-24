@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"os"
 
@@ -34,17 +33,18 @@ func main() {
 
 		go func() {
 			defer conn.Close()
+			buf := make([]byte, 1024)
 			for {
-				data, err := io.ReadAll(conn)
+				_, err := conn.Read(buf)
 
 				fmt.Println("did it read?")
 				if err != nil {
 					fmt.Println("Error reading content: ", err.Error())
 					break
 				}
-				fmt.Println(string(data))
+				fmt.Println(string(buf))
 
-				_, rsp := resp.ReadNextRESP(data)
+				_, rsp := resp.ReadNextRESP(buf)
 
 				response, err := DispatchCommand(rsp)
 				if err != nil {

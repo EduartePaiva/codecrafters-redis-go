@@ -6,9 +6,6 @@ import (
 	"os"
 )
 
-var _ = net.Listen
-var _ = os.Exit
-
 const (
 	PONG = "+PONG\r\n"
 )

@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
+
+	"github.com/codecrafters-io/redis-starter-go/internal/resp"
 )
 
 const (
@@ -31,18 +34,25 @@ func main() {
 
 		go func() {
 			defer conn.Close()
-			buf := make([]byte, 1024)
 			for {
-				_, err := conn.Read(buf)
+				data, err := io.ReadAll(conn)
 				if err != nil {
 					fmt.Println("Error reading content: ", err.Error())
 					break
 				}
-				fmt.Println(string(buf))
+				fmt.Println(string(data))
 
-				_, err = conn.Write([]byte(PONG))
+				_, rsp := resp.ReadNextRESP(data)
+
+				response, err := DispatchCommand(rsp)
 				if err != nil {
-					fmt.Println("Error sending PONG response: ", err.Error())
+					fmt.Println("Error processing command: ", err.Error())
+					break
+				}
+
+				_, err = conn.Write(response)
+				if err != nil {
+					fmt.Println("Error sending response: ", err.Error())
 					break
 				}
 			}

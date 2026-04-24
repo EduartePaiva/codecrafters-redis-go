@@ -8,7 +8,7 @@ import (
 
 func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 	result := make([]byte, 0)
-	values := make([]string, 1)
+	values := []string{}
 
 	RESP.ForEach(func(r resp.RESP) bool {
 		values = append(values, r.String())

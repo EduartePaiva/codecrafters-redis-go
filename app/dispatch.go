@@ -10,17 +10,18 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 	result := make([]byte, 0)
 	values := make([]string, 1)
 
-	for r := range RESP.ForEach {
+	RESP.ForEach(func(r resp.RESP) bool {
 		values = append(values, r.String())
-	}
+		return true
+	})
 	cmd := values[0]
 	args := values[1:]
 
 	switch cmd {
 	case "PING":
-		resp.AppendString(result, "PONG")
+		result = resp.AppendString(result, "PONG")
 	case "ECHO":
-		resp.AppendBulkString(result, args[0])
+		result = resp.AppendBulkString(result, args[0])
 	default:
 		return nil, fmt.Errorf("unknown command %s", cmd)
 	}

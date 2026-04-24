@@ -36,6 +36,8 @@ func main() {
 			defer conn.Close()
 			for {
 				data, err := io.ReadAll(conn)
+
+				fmt.Println("did it read?")
 				if err != nil {
 					fmt.Println("Error reading content: ", err.Error())
 					break

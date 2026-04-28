@@ -34,7 +34,7 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 	case "GET":
 		value, ok := CACHE[args[0]]
 		if ok {
-			result = resp.AppendString(result, value)
+			result = resp.AppendBulkString(result, value)
 		} else {
 			result = resp.AppendNull(result)
 		}

@@ -72,10 +72,10 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 		rpush_mu.Lock()
 		list, ok := RPUSHVALUES[args[0]]
 		if !ok {
-			list = make([]string, 1)
+			list = make([]string, 0)
 		}
 		list = append(list, args[1])
-		fmt.Println(list)
+		fmt.Println(list, len(list))
 		RPUSHVALUES[args[0]] = list
 		rpush_mu.Unlock()
 		return resp.AppendInt(result, int64(len(list))), nil

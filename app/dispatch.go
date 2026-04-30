@@ -93,7 +93,7 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 			return resp.AppendArray(result, 0), nil
 		}
 
-		end = min(end+1, len(list))
+		end = min(end, len(list))
 
 		newList := list[start:end]
 		resp.AppendArray(result, len(newList))

@@ -68,14 +68,12 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 		}
 		return resp.AppendNull(result), nil
 	case "RPUSH":
-		fmt.Println(args)
 		rpush_mu.Lock()
 		list, ok := RPUSHVALUES[args[0]]
 		if !ok {
 			list = make([]string, 0)
 		}
-		list = append(list, args[1])
-		fmt.Println(list, len(list))
+		list = append(list, args[1:]...)
 		RPUSHVALUES[args[0]] = list
 		rpush_mu.Unlock()
 		return resp.AppendInt(result, int64(len(list))), nil

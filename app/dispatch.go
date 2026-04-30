@@ -75,6 +75,7 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 			list = make([]string, 1)
 		}
 		list = append(list, args[1])
+		fmt.Println(list)
 		RPUSHVALUES[args[0]] = list
 		rpush_mu.Unlock()
 		return resp.AppendInt(result, int64(len(list))), nil

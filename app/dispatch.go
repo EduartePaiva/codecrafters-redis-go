@@ -68,6 +68,7 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 		}
 		return resp.AppendNull(result), nil
 	case "RPUSH":
+		fmt.Println(args)
 		rpush_mu.Lock()
 		list, ok := RPUSHVALUES[args[0]]
 		if !ok {

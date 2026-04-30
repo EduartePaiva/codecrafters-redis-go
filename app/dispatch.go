@@ -77,6 +77,32 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 		RPUSHVALUES[args[0]] = list
 		rpush_mu.Unlock()
 		return resp.AppendInt(result, int64(len(list))), nil
+	case "LRANGE":
+		rpush_mu.Lock()
+		key := args[0]
+		start, err := strconv.Atoi(args[1])
+		if err != nil {
+			return nil, err
+		}
+		end, err := strconv.Atoi(args[2])
+		if err != nil {
+			return nil, err
+		}
+		list, ok := RPUSHVALUES[key]
+		if !ok || start >= len(list) || start > end {
+			return resp.AppendArray(result, 0), nil
+		}
+
+		end = min(end+1, len(list))
+
+		newList := list[start:end]
+		resp.AppendArray(result, len(newList))
+		for _, value := range newList {
+			resp.AppendBulkString(result, value)
+		}
+		rpush_mu.Unlock()
+
+		return result, nil
 	default:
 		return nil, fmt.Errorf("unknown command %s", cmd)
 	}

@@ -15,8 +15,10 @@ type CacheValue struct {
 	ExpireAt *time.Time
 }
 
-var mu sync.Mutex
+var cache_mu sync.Mutex
+var rpush_mu sync.Mutex
 var CACHE map[string]CacheValue = make(map[string]CacheValue)
+var RPUSHVALUES map[string][]string = make(map[string][]string)
 
 func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 	result := make([]byte, 0)
@@ -65,20 +67,30 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 			delete(CACHE, args[0])
 		}
 		return resp.AppendNull(result), nil
+	case "RPUSH":
+		rpush_mu.Lock()
+		list, ok := RPUSHVALUES[args[0]]
+		if !ok {
+			list = make([]string, 1)
+		}
+		list = append(list, args[1])
+		RPUSHVALUES[args[0]] = list
+		rpush_mu.Unlock()
+		return resp.AppendInt(result, int64(len(list))), nil
 	default:
 		return nil, fmt.Errorf("unknown command %s", cmd)
 	}
 }
 
 func simpleSet(key, value string) {
-	mu.Lock()
+	cache_mu.Lock()
 	CACHE[key] = CacheValue{Value: value}
-	mu.Unlock()
+	cache_mu.Unlock()
 }
 
 func delayedSet(key, value string, delay time.Duration) {
-	mu.Lock()
+	cache_mu.Lock()
 	expireAt := time.Now().Add(delay)
 	CACHE[key] = CacheValue{Value: value, ExpireAt: &expireAt}
-	mu.Unlock()
+	cache_mu.Unlock()
 }

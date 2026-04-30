@@ -93,15 +93,17 @@ func DispatchCommand(RESP resp.RESP) ([]byte, error) {
 			return resp.AppendArray(result, 0), nil
 		}
 
-		end = min(end, len(list))
+		end = min(end+1, len(list))
 
 		newList := list[start:end]
+		fmt.Println(newList)
 		resp.AppendArray(result, len(newList))
 		for _, value := range newList {
 			resp.AppendBulkString(result, value)
 		}
 		rpush_mu.Unlock()
 
+		fmt.Println(result)
 		return result, nil
 	default:
 		return nil, fmt.Errorf("unknown command %s", cmd)
